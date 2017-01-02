@@ -26,3 +26,16 @@ defmodule PhxOembed.Card do
     |> validate_required([:url, :card_type])
   end
 end
+
+# override the Poison enconder's library implmentation for encoding our struct.
+# This is done because we are passing a model to the view, so we need to make a
+# custom key mapping to sanitize the _meta_ data in the model.
+defimpl Poison.Encoder, for: PhxOembed.Card do
+  def encode(model, opts) do
+    model
+    |> Map.take([:url, :card_type, :title, :author_name, :author_url,
+                 :provider_name, :provider_url, :cache_age, :thumbnail_url,
+                 :thumbnail_width, :thumbnail_height])
+    |>Poison.Encoder.encode(opts)
+  end
+end
